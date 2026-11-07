@@ -7,7 +7,7 @@
 set -euo pipefail
 
 : "${CLOUDFLARE_ACCOUNT_ID:?}" "${CLOUDFLARE_API_TOKEN:?}"
-NS=${ARTIFACTS_NAMESPACE:-artifacts-repro}
+NS=${ARTIFACTS_NAMESPACE:-repro-$(date +%s)}  # fresh namespace per run; created on first repo create
 BASE="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/artifacts/namespaces/$NS"
 api() { curl -s -w '\n%{http_code}' -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json' "$@"; }
 code() { tail -n1 <<<"$1"; }
@@ -35,3 +35,6 @@ for i in $(seq 1 "${1:-5}"); do
   echo "trial $i: DELETE=$del  immediate POST=$first $first_err  GET=$get  create succeeded after ${freed} ms ($attempts attempts)"
   api -X DELETE "$BASE/repos/$name" >/dev/null
 done
+
+# Remove the run's namespace once its repos are gone (it must be empty).
+for _ in $(seq 1 20); do [ "$(code "$(api -X DELETE "${BASE%/namespaces/*}/namespaces/$NS")")" = 204 ] && break; sleep 1; done

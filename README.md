@@ -2,7 +2,7 @@
 
 Minimal repro for [Cloudflare Artifacts](https://developers.cloudflare.com/artifacts/). After a delete succeeds, creating a repo with the same name fails with `ALREADY_EXISTS` (10201) for about 1–2.5 seconds. During that window `get` returns `NOT_FOUND` (10200), so there's no way to tell the delete is still in progress.
 
-Both versions use a throwaway namespace, `artifacts-repro` (set `ARTIFACTS_NAMESPACE` to change it), and delete what they create.
+The script creates a fresh namespace per run (`repro-<timestamp>`, or set `ARTIFACTS_NAMESPACE`) and deletes everything it creates. The Worker uses the namespace `artifacts-recreate-repro` and deletes its repos after each trial.
 
 ## REST
 
