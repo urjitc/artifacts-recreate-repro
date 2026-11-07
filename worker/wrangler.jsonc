@@ -1,0 +1,6 @@
+{
+  "name": "artifacts-recreate-repro",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-01",
+  "artifacts": [{ "binding": "ARTIFACTS", "namespace": "artifacts-repro" }]
+}
